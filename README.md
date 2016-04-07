@@ -1,4 +1,4 @@
-# node-devents
+# redis-event-emitter
 
 A simple Redis-based EventEmitter.
 
