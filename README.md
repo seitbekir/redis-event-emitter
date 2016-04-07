@@ -1,83 +1,73 @@
 # node-devents
 
-A simple Redis-based distributed EventEmitter.
+A simple Redis-based EventEmitter.
+
+Using this module you can emit any type of JS entities as argumets to many servers.
+For example you can use in in cluster applications as default event emitter via local redis or replicate your service to many servers and use this emitter as bus.
 
 ## Installation
 
-    npm install devents
+    npm install redis-event-emitter
 
 ## Usage
 
-    // MACHINE 1 (which also happens to be running redis)
-    
-    var devents = require( 'devents' );
+Lets make simple chat in console.
+Just start this code from test in two windows and type your message.
 
-    // create an event emitter that connects to redis running locally:
-    
-    var emitter = new devents.EventEmitter();
+```js
+// create connection (you can use it in whole project, but store in file and export)
+var redisEmitter = require('../index.js')({
+	host: 'redishost.com'
+});
 
-    // listen for 'some event' and print out the array it gets
-    emitter.on( 'some event', function( values ) {
-        console.log( values );
-    });
+process.stdin.setEncoding('utf8');
 
-    // emit 'some event'
-    emitter.emit( 'some event', [ 1, 2, 3 ] );
-    
-Now, on another machine:
+// Input data and press enter
+process.stdin.on('readable', function() {
+	var chunk = process.stdin.read();
+	if (chunk !== null) {
+		// On enter emit the message and the function
+		// to execute on another instance of this test program
+		redisEmitter.emit('mess', chunk, function(arg) {
+			console.log("Display: " + arg);
+		});
+	}
+});
 
-    // MACHINE 2
-    var devents = require( 'devents' );
+process.stdin.on('end', function() {
+  process.stdout.write('end');
+});
 
-    // create an event emitter that connects to redis running on MACHINE 1
-    
-    var emitter = new devents.EventEmitter({
-        host: 'machine1.company.com',
-        port: 6379
-    });
-
-    // listen for 'some event' and print out the array it gets
-    emitter.on( 'some event', function( values ) {
-        console.log( values );
-    });
-
-Now, on MACHINE 1 you'd see:
-
-    [ 1, 2, 3 ]
-
-But (amazingly) on MACHINE 2 you'd also see:
-
-    [ 1, 2, 3 ]
-    
+redisEmitter.on('mess', function(message, callback) {
+	// call function sent fron far server using current scope
+	callback(message);
+});
+```
 ## Caveats
 
-A DistributedEventEmitter can only really handle JSON-encodable objects as arguments to the events.
+When you push an function as argument you should understand that it will execute on another server and will not use current scope, so, don't use local variables to execute.
+Also, no sures for now that emit was executed. It realy works like typical push.
 
-That is, arguments are JSON-encoded before being sent to Redis.  Functions on the object prototype
-will not work on the other side.  And if your object causes JSON.stringify() to throw, that error
-is left uncaught.
-
-Be sure to keep your arguments to basic, JSON-encodable types.
+For serializing used https://github.com/yahoo/serialize-javascript module
 
 ## API
 
-devents.DistributedEventEmitter inherits from events.EventEmitter and you should be able to use it
-exactly as you would expect, except that events are routed through Redis (if connected).
+Options:
+* host: '127.0.0.1', // Redis server host
+* port: 6379, // Redis server port
+* prefix: 'redis:emitter', // prefix
+* debug: false // console.log some data
 
 Note: When connected to a Redis server, all events are routed through the server which may affect
 their latency locally as one would expect.
 
 ## TODO
 
-* Testing
+* Promises to make sure that event emited.
 
 ## Note on Patches/Pull Requests
 
-* They are very welcome. 
+* They are very welcome.
 * Fork the project.
 * Make your feature addition or bug fix, preferably in a branch.
 * Send me a pull request.
-
-## License
-
-node-devents is under the BSD license and you may use the code for any purpose you like with or without attribution.

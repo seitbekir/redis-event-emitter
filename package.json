@@ -1,25 +1,34 @@
 {
-  "name" : "devents",
-  "description" : "A simple Redis-based distributed event emitter.",
-  "author" : "Andy Burke <aburke@bitflood.org>",
-  "url" : "https://github.com/andyburke/node-devents",
-  "contributors": [
-  ],
-  "keywords" : [
-    "events",
-    "distributed",
-    "eventemitter"
-  ],
-  "main" : "./devents.js",
-  "version" : "0.0.3",
-  "repository" : { 
-    "type" : "git", 
-    "url" : "git://github.com/andyburke/node-devents.git"
-  },
+  "name": "redis-event-emitter",
+  "version": "1.0.1",
+  "description": "Redis event emitter just as you've wanted.",
+  "main": "index.js",
   "dependencies": {
-    "redis": "0.8.x"
+    "extend": "^3.0.0",
+    "redis": "^0.8.6",
+    "serialize-javascript": "^1.2.0"
   },
-  "engines": {
-    "node": ">= 0.8.0"
-  }
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seitbekir/redis-event-emitter.git"
+  },
+  "keywords": [
+    "redis",
+    "eventemitter",
+    "evente-mitter",
+    "emitter",
+    "events",
+    "redis-event",
+    "redis-event-emitter"
+  ],
+  "author": "seitbekir",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seitbekir/redis-event-emitter/issues"
+  },
+  "homepage": "https://github.com/seitbekir/redis-event-emitter#readme"
 }
