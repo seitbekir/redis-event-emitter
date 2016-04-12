@@ -102,7 +102,6 @@ RedisEventEmitter.prototype.apply = function(locals) {
 		for (var i in _locals) {
 			if (typeof _locals[i] == "object" && _locals[i] !== null) {
 				str = prepare(str, prefix + i);
-				continue;
 			}
 			str = str.replace(prefix + i, serialize(_locals[i]));
 		}
