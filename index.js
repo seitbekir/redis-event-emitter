@@ -9,7 +9,7 @@ var opts = {
 	port: 6379,
 	prefix: 'redis:emitter',
 	debug: false
-}
+};
 
 function objToArray(obj) {
 	var result = [];
@@ -81,15 +81,41 @@ RedisEventEmitter.prototype.emit = function() {
 	self.opts.debug && console.log('emit', self.pubConnected);
 	if (self.pubConnected)
 	{
-		self.pub.publish( self.opts.prefix, serialize(args));
+		args = this.prepare(serialize(args));
+		this.prepare = RedisEventEmitter.prototype.prepare;
+
+		self.pub.publish( self.opts.prefix, args);
 		return self;
 	}
 	else
 	{
 		return EventEmitter.prototype.emit.apply(self, args);
 	}
-}
+};
+RedisEventEmitter.prototype.apply = function(locals) {
+
+	 function prepare(str, prefix) {
+		prefix = prefix || "locals";
+		var _locals = eval("(" + prefix + ")");
+		prefix = prefix + ".";
+
+		for (var i in _locals) {
+			if (typeof _locals[i] == "object" && _locals[i] !== null) {
+				str = prepare(str, prefix + i);
+				continue;
+			}
+			str = str.replace(prefix + i, serialize(_locals[i]));
+		}
+		return str;
+	}
+	this.prepare = prepare;
+
+	return this;
+};
+RedisEventEmitter.prototype.prepare = function(str) {
+	return str;
+};
 
 module.exports = function(_opts) {
 	return new RedisEventEmitter(_opts);
-}
+};

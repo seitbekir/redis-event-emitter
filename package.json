@@ -1,6 +1,6 @@
 {
   "name": "redis-event-emitter",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Redis event emitter just as you've wanted.",
   "main": "index.js",
   "dependencies": {
@@ -25,10 +25,17 @@
     "redis-event",
     "redis-event-emitter"
   ],
-  "author": "seitbekir",
+  "author": {
+    "name": "seitbekir"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/seitbekir/redis-event-emitter/issues"
   },
-  "homepage": "https://github.com/seitbekir/redis-event-emitter#readme"
+  "homepage": "https://github.com/seitbekir/redis-event-emitter#readme",
+  "readme": "# redis-event-emitter\n\nA simple Redis-based EventEmitter.\n\nUsing this module you can emit any type of JS entities as argumets to many servers.\nFor example you can use in in cluster applications as default event emitter via local redis or replicate your service to many servers and use this emitter as bus.\n\n## Installation\n\n    npm install redis-event-emitter\n\n## Usage\n\nLets make simple chat in console.\nJust start this code from test in two windows and type your message.\n\n```js\n// create connection (you can use it in whole project, but store in file and export)\nvar redisEventEmitter = require('../index.js')({\n    host: 'redishost.com'\n});\n\nprocess.stdin.setEncoding('utf8');\n\n// Input data and press enter\nprocess.stdin.on('readable', function() {\n\tvar chunk = process.stdin.read();\n\tif (chunk !== null) {\n\t\t// On enter emit the message and the function\n\t\t// to execute on another instance of this test program\n\t\tredisEventEmitter.emit('mess', chunk, function(arg) {\n\t\t\tconsole.log(\"Display: \" + arg);\n\t\t});\n\t}\n});\n\nprocess.stdin.on('end', function() {\n  process.stdout.write('end');\n});\n\nredisEventEmitter.on('mess', function(message, callback) {\n\t// call function sent fron far server using current scope\n\tcallback(message);\n});\n```\n## Caveats\n\nWhen you push an function as argument you should understand that it will execute on another server and will not use current scope, so, don't use local variables to execute.\nAlso, no sures for now that emit was executed. It realy works like typical push.\n\nFor serializing used https://github.com/yahoo/serialize-javascript module\n\n## API\n\nOptions:\n* host: '127.0.0.1', // Redis server host\n* port: 6379, // Redis server port\n* prefix: 'redis:emitter', // prefix\n* debug: false // console.log some data\n\nNote: When connected to a Redis server, all events are routed through the server which may affect\ntheir latency locally as one would expect.\n\n## TODO\n\n* Promises to make sure that event emited.\n\n## Note on Patches/Pull Requests\n\n* They are very welcome.\n* Fork the project.\n* Make your feature addition or bug fix, preferably in a branch.\n* Send me a pull request.\n",
+  "readmeFilename": "README.md",
+  "_id": "redis-event-emitter@1.0.2",
+  "_shasum": "96d87148b275d097ac7fdc88687f2bdf317be912",
+  "_from": "redis-event-emitter@>=1.0.2 <2.0.0"
 }

@@ -39,10 +39,38 @@ process.stdin.on('end', function() {
 });
 
 redisEventEmitter.on('mess', function(message, callback) {
-	// call function sent fron far server using current scope
+	// call function sent from far server
 	callback(message);
 });
 ```
+
+Also you can emit with local variables
+```js
+process.stdin.on('readable', function() {
+	var chunk = process.stdin.read();
+	if (chunk !== null) {
+		// define val locals to avoid IDE displaying warnings
+		var locals = {
+			chunk: chunk
+		};
+		redisEventEmitter
+		// apply your local variables before emit
+		.apply(locals)
+		.emit('mess2', function() {
+			// Then use your variables as is on another server.
+			// It will replace before sending to emitter
+			// Valiable must be called locals. It is reserver word inside module
+			console.log("Display: " + locals.chunk);
+		});
+	}
+});
+
+redisEventEmitter.on('mess2', function(callback) {
+	// call function sent from far server with special params
+	callback();
+});
+```
+
 ## Caveats
 
 When you push an function as argument you should understand that it will execute on another server and will not use current scope, so, don't use local variables to execute.
